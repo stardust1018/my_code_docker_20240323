@@ -122,31 +122,7 @@ void frame() {
 void runloop() {
   while (do_tick()) {
     usleep(10000);
-    if ((c = getch()) == 'a' && g_piece_cur_column > 0 && !check_hit(g_piece_cur_column - 1, g_piece_cur_row, r)) {
-      g_piece_cur_column--;
-    }
-    if (c == 'd' && g_piece_cur_column + NUM(r, 16) < 9 && !check_hit(g_piece_cur_column + 1, g_piece_cur_row, r)) {
-      g_piece_cur_column++;
-    }
-    if (c == 's') {
-      while (!check_hit(g_piece_cur_column, g_piece_cur_row + 1, r)) {
-        g_piece_cur_row++; // y表示当前块实时纵向坐标
-        update_piece();
-      }
-      remove_line();
-      new_piece();
-    }
-    if (c == 'w') {
-      ++r %= 4;
-      while (g_piece_cur_column + NUM(r, 16) > 9) {
-        g_piece_cur_column--;
-      }
-      if (check_hit(g_piece_cur_column, g_piece_cur_row, r)) {
-        g_piece_cur_column = px;
-        r = pr;
-      }
-    }
-    update_piece();
+    // update_piece(); // 不知道什么作用
     frame();
     refresh();
   }
