@@ -10,13 +10,15 @@ int g_score = 0;
 int g_piece_cur_column = 431424;
 int g_piece_cur_row = 598356;
 
+int g_rotation = 427089;
+
 // g_block layout is: {w-1,h-1}{x0,y0}{x1,y1}{x2,y2}{x3,y3} (two bits each)
-int r = 427089, px = 247872, py = 799248, pr,
+int px = 247872, py = 799248, pr,
     c = 348480, p = 615696, board[20][10];
 
 int g_block[7][4] = {
     {g_piece_cur_column, g_piece_cur_row, g_piece_cur_column, g_piece_cur_row},
-    {r, p, r, p},
+    {g_rotation, p, g_rotation, p},
     {c, c, c, c},
     {599636, 431376, 598336, 432192},
     {411985, 610832, 415808, 595540},
@@ -31,8 +33,8 @@ int NUM(int x, int y) { return 3 & g_block[p][x] >> y; }
 void new_piece() {
   g_piece_cur_row = py = 0;
   p = rand() % 7;
-  r = pr = rand() % 4;
-  g_piece_cur_column = px = rand() % (10 - NUM(r, 16));
+  g_rotation = pr = rand() % 4;
+  g_piece_cur_column = px = rand() % (10 - NUM(g_rotation, 16));
 }
 
 // set the value fo the board for a particular (x,y,r) piece
@@ -44,8 +46,8 @@ void set_piece(int x, int y, int r, int v) {
 
 // move a piece from old (p*) coords to new
 int update_piece() {
-  set_piece(px, py, pr, 0);
-  set_piece(px = g_piece_cur_column, py = g_piece_cur_row, pr = r, p + 1);
+  set_piece(px, py, pr, 0); // 方块向下移动过程中，之前的区域清空
+  set_piece(px = g_piece_cur_column, py = g_piece_cur_row, pr = g_rotation, p + 1); // 在新的区域重新绘制
 }
 
 // check if placing p at (x,y,r) will be a collision
@@ -66,7 +68,7 @@ int check_hit(int x, int y, int r) {
 
 // remove line(s) from the board if they're full
 void remove_line() {
-  for (int row = g_piece_cur_row; row <= g_piece_cur_row + NUM(r, 18); row++) {
+  for (int row = g_piece_cur_row; row <= g_piece_cur_row + NUM(g_rotation, 18); row++) {
     c = 1;
     for (int i = 0; i < 10; i++) {
       c *= board[row][i];
@@ -87,16 +89,8 @@ int do_tick() {
     g_tick++;
     if (g_tick > 50) { // 50:控制piece下降速度
         g_tick = 0;
-        if (check_hit(g_piece_cur_column, g_piece_cur_row + 1, r)) {
-            if (!g_piece_cur_row) {
-            return 0;
-            }
-            remove_line();
-            new_piece();
-        } else {
-            g_piece_cur_row++;
-            update_piece();
-        }
+        g_piece_cur_row++;
+        update_piece();
     }
     return 1;
 }
@@ -122,7 +116,31 @@ void frame() {
 void runloop() {
   while (do_tick()) {
     usleep(10000);
-    // update_piece(); // 不知道什么作用
+    if ((c = getch()) == 'a' && g_piece_cur_column > 0 && !check_hit(g_piece_cur_column - 1, g_piece_cur_row, g_rotation)) {
+      g_piece_cur_column--;
+    }
+    if (c == 'd' && g_piece_cur_column + NUM(g_rotation, 16) < 9 && !check_hit(g_piece_cur_column + 1, g_piece_cur_row, g_rotation)) {
+      g_piece_cur_column++;
+    }
+    if (c == 's') {
+      while (!check_hit(g_piece_cur_column, g_piece_cur_row + 1, g_rotation)) {
+        g_piece_cur_row++; // y表示当前块实时纵向坐标
+        update_piece();
+      }
+      remove_line();
+      new_piece();
+    }
+    if (c == 'w') {
+      ++g_rotation %= 4;
+      while (g_piece_cur_column + NUM(g_rotation, 16) > 9) {
+        g_piece_cur_column--;
+      }
+      if (check_hit(g_piece_cur_column, g_piece_cur_row, g_rotation)) {
+        g_piece_cur_column = px;
+        g_rotation = pr;
+      }
+    }
+    update_piece();
     frame();
     refresh();
   }
