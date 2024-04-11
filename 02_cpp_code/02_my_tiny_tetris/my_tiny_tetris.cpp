@@ -10,9 +10,15 @@ int g_score = 0;
 int g_piece_cur_column = 431424;
 int g_piece_cur_row = 598356;
 
+int g_piece = 615696;
+int g_rotation = 427089;
+
+constexpr uint32_t g_board_row_max = 20;
+constexpr uint32_t g_board_col_max = 10;
+int board[g_board_row_max][g_board_col_max]; // 以单个方块为维度的整个面板
+
 // g_block layout is: {w-1,h-1}{x0,y0}{x1,y1}{x2,y2}{x3,y3} (two bits each)
-int r = 427089, px = 247872, py = 799248, pr,
-    c = 348480, p = 615696, board[20][10];
+int px = 247872, py = 799248, pr, c = 348480;
 
 // 7: 表示7种方块形状
 // 4：表示每个形状有4个角度形态
@@ -28,30 +34,41 @@ int g_block[7][4] = {
 };
 
 // extract a 2-bit number from a g_block entry
-int NUM(int x, int y) { return 3 & g_block[p][x] >> y; }
+// NUM(g_rotation, 16) -- 指定一个角度，固定偏移16位，是获取方块高度
+// NUM(g_rotation, 18) -- 指定一个角度，固定偏移18位，是获取方块宽度
+int NUM(int x, int y) { return 3 & g_block[g_piece][x] >> y; }
 
 // create a new piece, don't remove old one (it has landed and should stick)
 void new_piece() {
   g_piece_cur_row = py = 0;
-  p = rand() % 7;
-  r = pr = rand() % 4;
-  g_piece_cur_column = px = rand() % (10 - NUM(r, 16));
+  g_piece = rand() % 7; // 获取一个随机方块类型
+  g_rotation = pr = rand() % 4; // 获取对应方块类型中的一个随机角度
+  g_piece_cur_column = px = rand() % (g_board_col_max - NUM(g_rotation, 16));
 }
 
 // set the value fo the board for a particular (x,y,r) piece
+// v表示当前board颜色
+// r表示角度，即取第几个形态
+// y表示
+// x表示
 void set_piece(int x, int y, int r, int v) {
   for (int i = 0; i < 8; i += 2) {
-    board[NUM(r, i * 2) + y][NUM(r, (i * 2) + 2) + x] = v;
+    int boardRow = NUM(r, i * 2) + y;
+    int boardCol = NUM(r, (i * 2) + 2) + x;
+    board[boardRow][boardCol] = v;
   }
 }
 
-// move a piece from old (p*) coords to new
+// move a piece from old (g_piece*) coords to new
 int update_piece() {
-  set_piece(px, py, pr, 0);
-  set_piece(px = g_piece_cur_column, py = g_piece_cur_row, pr = r, p + 1);
+  set_piece(px, py, pr, COLOR_BLACK); // 方块向下移动过程中，之前的区域清空
+  px = g_piece_cur_column;
+  py = g_piece_cur_row;
+  pr = g_rotation;
+  set_piece(px, py, pr, g_piece + 1); // 在新的区域重新绘制
 }
 
-// check if placing p at (x,y,r) will be a collision
+// check if placing g_piece at (x,y,r) will be a collision
 int check_hit(int x, int y, int r) {
   if (y + NUM(r, 18) > 19) {
     return 1;
@@ -63,15 +80,15 @@ int check_hit(int x, int y, int r) {
         c++;
     }
   }
-  set_piece(px, py, pr, p + 1);
+  set_piece(px, py, pr, g_piece + 1);
   return c;
 }
 
 // remove line(s) from the board if they're full
 void remove_line() {
-  for (int row = g_piece_cur_row; row <= g_piece_cur_row + NUM(r, 18); row++) {
+  for (int row = g_piece_cur_row; row <= g_piece_cur_row + NUM(g_rotation, 18); row++) {
     c = 1;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < g_board_col_max; i++) {
       c *= board[row][i];
     }
     if (!c) {
@@ -80,7 +97,7 @@ void remove_line() {
     for (int i = row - 1; i > 0; i--) {
       memcpy(&board[i + 1][0], &board[i][0], 40);
     }
-    memset(&board[0][0], 0, 10);
+    memset(&board[0][0], 0, g_board_col_max);
     g_score++;
   }
 }
@@ -90,7 +107,7 @@ int do_tick() {
     g_tick++;
     if (g_tick > 50) { // 50:控制piece下降速度
         g_tick = 0;
-        if (check_hit(g_piece_cur_column, g_piece_cur_row + 1, r)) {
+        if (check_hit(g_piece_cur_column, g_piece_cur_row + 1, g_rotation)) {
             if (!g_piece_cur_row) {
             return 0;
             }
@@ -106,9 +123,9 @@ int do_tick() {
 
 // draw the board and g_score
 void frame() {
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < g_board_row_max; i++) {
         move(1 + i, 1); // otherwise the box won't draw
-        for (int j = 0; j < 10; j++) {
+        for (int j = 0; j < g_board_col_max; j++) {
             if (board[i][j]) {
                 attron(262176 | board[i][j] << 8);
             }
@@ -125,14 +142,14 @@ void frame() {
 void runloop() {
   while (do_tick()) {
     usleep(10000);
-    if ((c = getch()) == 'a' && g_piece_cur_column > 0 && !check_hit(g_piece_cur_column - 1, g_piece_cur_row, r)) {
+    if ((c = getch()) == 'a' && g_piece_cur_column > 0 && !check_hit(g_piece_cur_column - 1, g_piece_cur_row, g_rotation)) {
       g_piece_cur_column--;
     }
-    if (c == 'd' && g_piece_cur_column + NUM(r, 16) < 9 && !check_hit(g_piece_cur_column + 1, g_piece_cur_row, r)) {
+    if (c == 'd' && g_piece_cur_column + NUM(g_rotation, 16) < 9 && !check_hit(g_piece_cur_column + 1, g_piece_cur_row, g_rotation)) {
       g_piece_cur_column++;
     }
     if (c == 's') {
-      while (!check_hit(g_piece_cur_column, g_piece_cur_row + 1, r)) {
+      while (!check_hit(g_piece_cur_column, g_piece_cur_row + 1, g_rotation)) {
         g_piece_cur_row++; // y表示当前块实时纵向坐标
         update_piece();
       }
@@ -140,13 +157,13 @@ void runloop() {
       new_piece();
     }
     if (c == 'w') {
-      ++r %= 4;
-      while (g_piece_cur_column + NUM(r, 16) > 9) {
+      ++g_rotation %= 4;
+      while (g_piece_cur_column + NUM(g_rotation, 16) > 9) {
         g_piece_cur_column--;
       }
-      if (check_hit(g_piece_cur_column, g_piece_cur_row, r)) {
+      if (check_hit(g_piece_cur_column, g_piece_cur_row, g_rotation)) {
         g_piece_cur_column = px;
-        r = pr;
+        g_rotation = pr;
       }
     }
     update_piece();
@@ -157,7 +174,7 @@ void runloop() {
 
 int main()
 {
-  srand(time(0));
+  srand(time(0)); // 设置伪随机数生成器的种子值
   initscr(); // 初始化curses库，准备创建终端界面
   start_color(); // 启用颜色功能
   // colours indexed by their position in the g_block

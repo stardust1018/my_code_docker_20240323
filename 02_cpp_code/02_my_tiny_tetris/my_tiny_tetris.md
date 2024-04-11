@@ -75,8 +75,22 @@ wmove：在窗口内移动光标到指定位置。
 
     // 清理 ncurses
     endwin();
-
 ```
+
+### 画板着色
+
+在代码`attron(262176 | board[i][j] << 8);`中，不同的board[i][j]值会绘制不同的颜色，
+board[i][j]值：是这个顺序
+#define COLOR_BLACK	0
+#define COLOR_RED	1
+#define COLOR_GREEN	2
+#define COLOR_YELLOW	3
+#define COLOR_BLUE	4
+#define COLOR_MAGENTA	5
+#define COLOR_CYAN	6
+#define COLOR_WHITE	7
+
+
 
 # 二、cmake编译处理
 
@@ -87,6 +101,13 @@ file(GLOB_RECURSE SRC_FILES *.c *.cpp)
 它会递归地搜索指定目录及其子目录中符合模式的文件。它会在构建系统生成期间执行一次，并将符合模式的文件路径匹配到一个变量中。
 
 # 三、俄罗斯方块逻辑实现
+规格：
+- 有七个规定形状的方块
+- 在一个画板区域内，左、右、下为封闭区域，方块每次从上面落下
+- 落下过程中，遇到阻挡后当前快停止落下；开始生成下一个随机块，并下落；
+- 落下过程中，当前一整行满了后，当前行消失，表示成功积满一行，并且上面的所有行依次往下落一行；落行过程中，满行状态判断继续生效；
+- 当某个块下落碰触阻挡，并且高度触碰顶部时，游戏失败；
+- wasd键可以控制  方块在下落过程中，旋转、左、下、右变动；
 ![alt text](image-8.png)
 ## 1.方块定义
 ### 1) 方块个数 piece num
