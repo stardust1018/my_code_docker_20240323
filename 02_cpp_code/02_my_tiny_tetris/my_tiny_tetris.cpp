@@ -9,15 +9,16 @@ int g_score = 0;
 
 int g_piece_cur_column = 431424;
 int g_piece_cur_row = 598356;
+int g_rotation = 427089;
 
 int g_piece = 615696;
-int g_rotation = 427089;
 
 constexpr uint32_t g_board_row_max = 20;
 constexpr uint32_t g_board_col_max = 10;
 int board[g_board_row_max][g_board_col_max]; // 以单个方块为维度的整个面板
 
 // g_block layout is: {w-1,h-1}{x0,y0}{x1,y1}{x2,y2}{x3,y3} (two bits each)
+// 应该是{h-1,w-1},之前写的应该有问题
 int px = 247872, py = 799248, pr, c = 348480;
 
 // 7: 表示7种方块形状
@@ -36,32 +37,32 @@ int g_block[7][4] = {
 // extract a 2-bit number from a g_block entry
 // NUM(g_rotation, 16) -- 指定一个角度，固定偏移16位，是获取方块高度
 // NUM(g_rotation, 18) -- 指定一个角度，固定偏移18位，是获取方块宽度
-int NUM(int x, int y) { return 3 & g_block[g_piece][x] >> y; }
+int NUM(int x, int y, int piece) { return 3 & g_block[piece][x] >> y; }
 
 // create a new piece, don't remove old one (it has landed and should stick)
 void new_piece() {
   g_piece_cur_row = py = 0;
   g_piece = rand() % 7; // 获取一个随机方块类型
   g_rotation = pr = rand() % 4; // 获取对应方块类型中的一个随机角度
-  g_piece_cur_column = px = rand() % (g_board_col_max - NUM(g_rotation, 16));
+  g_piece_cur_column = px = rand() % (g_board_col_max - NUM(g_rotation, 16, g_piece));
 }
 
 // set the value fo the board for a particular (x,y,r) piece
 // v表示当前board颜色
 // r表示角度，即取第几个形态
-// y表示
-// x表示
+// y表示纵向偏移值
+// x表示横向偏移值
 void set_piece(int x, int y, int r, int v) {
   for (int i = 0; i < 8; i += 2) {
-    int boardRow = NUM(r, i * 2) + y;
-    int boardCol = NUM(r, (i * 2) + 2) + x;
+    int boardRow = NUM(r, i * 2, g_piece) + y;
+    int boardCol = NUM(r, (i * 2) + 2, g_piece) + x;
     board[boardRow][boardCol] = v;
   }
 }
 
 // move a piece from old (g_piece*) coords to new
 int update_piece() {
-  set_piece(px, py, pr, COLOR_BLACK); // 方块向下移动过程中，之前的区域清空
+  set_piece(px, py, pr, 0); // 方块向下移动过程中，之前的区域清空
   px = g_piece_cur_column;
   py = g_piece_cur_row;
   pr = g_rotation;
@@ -70,13 +71,13 @@ int update_piece() {
 
 // check if placing g_piece at (x,y,r) will be a collision
 int check_hit(int x, int y, int r) {
-  if (y + NUM(r, 18) > 19) {
+  if (y + NUM(r, 18, g_piece) > 19) {
     return 1;
   }
   set_piece(px, py, pr, 0);
   c = 0;
   for (int i = 0; i < 8; i += 2) {
-    if (board[y + NUM(r, i * 2)][x + NUM(r, (i * 2) + 2)]) {
+    if (board[y + NUM(r, i * 2, g_piece)][x + NUM(r, (i * 2) + 2, g_piece)]) {
         c++;
     }
   }
@@ -86,7 +87,7 @@ int check_hit(int x, int y, int r) {
 
 // remove line(s) from the board if they're full
 void remove_line() {
-  for (int row = g_piece_cur_row; row <= g_piece_cur_row + NUM(g_rotation, 18); row++) {
+  for (int row = g_piece_cur_row; row <= g_piece_cur_row + NUM(g_rotation, 18, g_piece); row++) {
     c = 1;
     for (int i = 0; i < g_board_col_max; i++) {
       c *= board[row][i];
@@ -105,11 +106,12 @@ void remove_line() {
 // slowly g_tick the piece y position down so the piece falls
 int do_tick() {
     g_tick++;
-    if (g_tick > 50) { // 50:控制piece下降速度
+    if (g_tick > 100) { // 50:控制piece下降速度  下落时间是50 * 10000us = 500ms
         g_tick = 0;
         if (check_hit(g_piece_cur_column, g_piece_cur_row + 1, g_rotation)) {
             if (!g_piece_cur_row) {
-            return 0;
+              // 触顶，
+              return 0;
             }
             remove_line();
             new_piece();
@@ -142,10 +144,11 @@ void frame() {
 void runloop() {
   while (do_tick()) {
     usleep(10000);
-    if ((c = getch()) == 'a' && g_piece_cur_column > 0 && !check_hit(g_piece_cur_column - 1, g_piece_cur_row, g_rotation)) {
+    c = getch();
+    if (c == 'a' && g_piece_cur_column > 0 && !check_hit(g_piece_cur_column - 1, g_piece_cur_row, g_rotation)) {
       g_piece_cur_column--;
     }
-    if (c == 'd' && g_piece_cur_column + NUM(g_rotation, 16) < 9 && !check_hit(g_piece_cur_column + 1, g_piece_cur_row, g_rotation)) {
+    if (c == 'd' && g_piece_cur_column + NUM(g_rotation, 16, g_piece) < 9 && !check_hit(g_piece_cur_column + 1, g_piece_cur_row, g_rotation)) {
       g_piece_cur_column++;
     }
     if (c == 's') {
@@ -158,7 +161,7 @@ void runloop() {
     }
     if (c == 'w') {
       ++g_rotation %= 4;
-      while (g_piece_cur_column + NUM(g_rotation, 16) > 9) {
+      while (g_piece_cur_column + NUM(g_rotation, 16, g_piece) > 9) {
         g_piece_cur_column--;
       }
       if (check_hit(g_piece_cur_column, g_piece_cur_row, g_rotation)) {
