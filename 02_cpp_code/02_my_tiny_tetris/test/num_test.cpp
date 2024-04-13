@@ -83,14 +83,14 @@ TEST(SolutionTest, piece0_NUM_0_14) {
     EXPECT_EQ(para, 2);
 }
 
-// NUM(g_rotation, 16) -- 指定一个角度，固定偏移16位，是获取方块高度
+// NUM(g_rotation, 16) -- 指定一个角度，固定偏移16位，是获取方块宽度
 TEST(SolutionTest, piece0_NUM_0_16) {
     g_piece = 0;
     int para = NUM(0, 16); // 0,0 -- 0110 1001 0101 0100 0000 -- 12
     EXPECT_EQ(para, 2);
 }
 
-// NUM(g_rotation, 18) -- 指定一个角度，固定偏移18位，是获取方块宽度
+// NUM(g_rotation, 18) -- 指定一个角度，固定偏移18位，是获取方块高度
 TEST(SolutionTest, piece0_NUM_0_18) {
     g_piece = 0;
     int para = NUM(0, 18); // 0,0 -- 0110 1001 0101 0100 0000 -- 12
