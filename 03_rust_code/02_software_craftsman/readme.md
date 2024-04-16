@@ -51,3 +51,19 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - 利用match 处理Result结果
 - loop 循环
   - 一定要配合break使用
+
+## 3.1 变量与可变性
+- let声明变量，默认为不可变
+  - mut 声明的变量，才是可变的
+- 常量
+  - const 声明，全大写字母，中间下划线分割；
+  - 声明常量必须声明类型
+- 变量shadowing
+- rust中char 类型占用4个字节
+
+## 3.3 复合类型
+- tuple
+  - 类型 (type1, type2, type3)
+- 数组
+  - 类型[i32; 5]
+  - 二维数组[[i32;3];5]
