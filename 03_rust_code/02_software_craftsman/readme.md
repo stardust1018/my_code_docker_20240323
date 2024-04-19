@@ -67,3 +67,10 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - 数组
   - 类型[i32; 5]
   - 二维数组[[i32;3];5]
+
+## 4.3 切片
+学到的知识点：
+- 字符串切片
+  - 类型 &str
+- 数组切片
+  - 类型 &[type]
