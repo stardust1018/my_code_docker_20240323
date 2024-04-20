@@ -87,3 +87,9 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
   - std::fmt::Debug
   - #[derive(Debug)]
   - {:?} {:#?}
+
+## 5.3 struct 方法
+- impl 定义struct 方法
+- Self、self、&self、&mut self
+- 关联函数(静态方法)
+  - 不把self作为第一个参数的函数，可以用structName:function 直接调用。类似于c++ 类的静态成员函数；

@@ -4,6 +4,18 @@ struct Rectangle {
     length: u32,
 }
 
+// 定义Rectangle方法
+impl Rectangle {
+    fn area(self: &Self) -> u32 {
+        self.width * self.length
+    }
+
+    // 关联函数
+    fn square(size: u32) -> Rectangle {
+        Rectangle { width: size, length: size }
+    }
+}
+
 fn main() {
     println!("Hello, Rectangle!");
 
@@ -12,10 +24,8 @@ fn main() {
         length: 50,
     };
     println!("{:?}", rect);
-    let rect_area = area(&rect);
-    println!("area: {}", rect_area);
-}
+    println!("area: {}", rect.area());
 
-fn area(rect: &Rectangle) -> u32 {
-    rect.width * rect.length
+    let square = Rectangle::square(10);
+    println!("square:{:?}", square);
 }
