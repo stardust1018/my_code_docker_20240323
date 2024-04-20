@@ -74,3 +74,9 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
   - 类型 &str
 - 数组切片
   - 类型 &[type]
+
+## 5.1 struct
+学到的知识：
+- struct定义、初始化、访问
+- struct更新语法
+- tuple struct -- 类似tuple的struct，类型有名字，但内部元素没有名字
