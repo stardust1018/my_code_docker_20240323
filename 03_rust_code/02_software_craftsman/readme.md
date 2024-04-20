@@ -80,3 +80,10 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - struct定义、初始化、访问
 - struct更新语法
 - tuple struct -- 类似tuple的struct，类型有名字，但内部元素没有名字
+
+## 5.2 struct 例子
+- 从离散的数据引出为什么要使用struct
+- 对于struct的打印
+  - std::fmt::Debug
+  - #[derive(Debug)]
+  - {:?} {:#?}
