@@ -33,4 +33,16 @@ fn main() {
         println!("{}", s2);
         println!("{}", s3);
     }
+
+    {
+        println!("\nformat test");
+        let s1 = "melon".to_string();
+
+        for itr in s1.bytes() {
+            println!("{}", itr);
+        }
+        for itr in s1.chars() {
+            println!("{}", itr);
+        }
+    }
 }
