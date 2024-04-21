@@ -111,3 +111,15 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - 只关心一种匹配，忽略其他的所有情况；
 - 算是针对特殊场景的一种 语法糖；
 - if let 放弃了穷举的可能；
+
+## 7.1 package、crate、module
+- module
+  - rust代码组成单元。按照功能性、可读性和易用性进行重组
+  - 可以进行可见性 区分；
+  - mod名和文件名一样，所以拆分到同名rs文件后，mod 定义需要删除
+- crate
+  - crate root
+  - 从crate root的绝对路径引用
+- package
+  - cargo add packageName 或者在toml文件手动写入依赖项
+  - use 导入module
