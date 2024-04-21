@@ -158,3 +158,12 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - get()
 - insert()
 - entery().or_insert()
+
+## 10.3 trait
+- trait 定义和实现
+- impl trait_name 作为函数入参
+- impl bound 作为函数入参
+
+类似c++的虚函数，只声明，由具体的对象去实现，也可以有默认实现。
+rust中，将数据和方法分离的，确实给编码带来了很大的灵活性，但是对于属于c++ 类图来明确对象关系的，需要适应一下。
+不过，rust这种方式应该也可以继续用类图来表达 代码框架
