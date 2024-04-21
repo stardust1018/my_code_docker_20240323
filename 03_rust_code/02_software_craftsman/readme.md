@@ -151,3 +151,10 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - +
 - format!()
 - len
+
+## 8.5 HashMap
+- HashMap::new()
+- into_iter().collect()
+- get()
+- insert()
+- entery().or_insert()
