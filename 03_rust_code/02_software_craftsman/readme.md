@@ -93,3 +93,8 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - Self、self、&self、&mut self
 - 关联函数(静态方法)
   - 不把self作为第一个参数的函数，可以用structName:function 直接调用。类似于c++ 类的静态成员函数；
+
+## 6.1 定义枚举
+- rust中枚举的定义、初始化
+- 在枚举的类型中嵌入具体数据类型
+- 为枚举定义方法
