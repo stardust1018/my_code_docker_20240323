@@ -98,3 +98,16 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - rust中枚举的定义、初始化
 - 在枚举的类型中嵌入具体数据类型
 - 为枚举定义方法
+
+## 6.2 option枚举
+- Some
+- None
+
+## 6.3 match
+- match匹配时，必须穷举所有的可能
+- 通配符 _ 可以表示其余所有可能；
+
+## 6.4 if let
+- 只关心一种匹配，忽略其他的所有情况；
+- 算是针对特殊场景的一种 语法糖；
+- if let 放弃了穷举的可能；
