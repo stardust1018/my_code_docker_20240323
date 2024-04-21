@@ -123,3 +123,20 @@ https://rust-coding-guidelines.github.io/rust-coding-guidelines-zh/safe-guides/c
 - package
   - cargo add packageName 或者在toml文件手动写入依赖项
   - use 导入module
+
+## 8.1 vector
+- 创建vector
+  - Vector::new
+  - vec![]
+- 常用方法
+  - push
+  - pop
+  - len
+  - iter
+  - iter_mut
+  - []
+  - get
+- 所有权和引用
+  - vector在栈上是由一个指针、实际长度、容量大小确定的；
+  - 当实际长度不够时，会在堆上重新配置一块更大的内存空间，并将原来的内容拷贝到新的区域。
+- enum + vector 可以实现利用vector存储多种不同的数据类型
