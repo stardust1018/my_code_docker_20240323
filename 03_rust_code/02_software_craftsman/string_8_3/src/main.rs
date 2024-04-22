@@ -45,4 +45,20 @@ fn main() {
             println!("{}", itr);
         }
     }
+
+    {
+        println!("\n字符串分割");
+        let s1 = "melon".to_string();
+        let s2 = String::from("love jiaojiao");
+        let s3 = format!("{} {}", s1, s2);
+
+        let arr: Vec<&str> = s3.split(' ').collect();
+        println!("{:?}", arr);
+
+        let arr1: Vec<&str> = s3.split_whitespace().collect();
+        println!("{:?}", arr1);
+
+        let res = s3.split_once(' ').unwrap_or(("aaa", "bbb"));
+        println!("{:?}", res);
+    }
 }
