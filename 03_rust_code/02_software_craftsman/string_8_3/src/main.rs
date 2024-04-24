@@ -61,4 +61,18 @@ fn main() {
         let res = s3.split_once(' ').unwrap_or(("aaa", "bbb"));
         println!("{:?}", res);
     }
+
+    {
+        println!("\n字符串转化为数字");
+        let str1 = String::from("123");
+        let num1:u32 = str1.parse().unwrap_or(0);
+        println!("num1:{}", num1);
+
+        let str1_hex = format!("0x{:X}", num1);
+        println!("str1_hex:{}", str1_hex);
+
+        let str2 = String::from("3.14");
+        let num2:f64 = str2.parse().unwrap_or(0.0);
+        println!("num2:{}", num2);
+    }
 }
