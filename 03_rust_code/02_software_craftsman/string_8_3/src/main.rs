@@ -75,4 +75,8 @@ fn main() {
         let num2:f64 = str2.parse().unwrap_or(0.0);
         println!("num2:{}", num2);
     }
+
+    {
+        
+    }
 }
