@@ -35,15 +35,26 @@ fn main() {
     }
 
     {
-        println!("\nformat test");
+        println!("\nString traversal");
         let s1 = "melon".to_string();
 
+        // String 按照字节遍历
         for itr in s1.bytes() {
             println!("{}", itr);
         }
+
+        // String按照字符遍历
         for itr in s1.chars() {
             println!("{}", itr);
         }
+    }
+
+    {
+        println!("\n从String中取出单个字符");
+        let s = String::from("EN中文");
+        let idx = 3;
+        let ch = s.chars().nth(idx).unwrap(); // nth 函数是从迭代器中取出某值的方法，请不要在遍历中这样使用！
+        println!("{}", ch);
     }
 
     {
